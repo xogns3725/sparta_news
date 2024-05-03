@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from django.core.cache import cache
 from .models import Article
 from .serializers import ArticleSrializer
@@ -8,12 +9,13 @@ from .serializers import ArticleSrializer
 
 
 class ArticleListAPIView(APIView):
-    def get(self, request):#article 리스트
+    def get(self, request):  # article 리스트
         articles = Article.objects.all()
         serializer = ArticleSrializer(articles, many=True)
         return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = ArticleSrializer(data= request.data)
+
+    def post(self, request):  # 게시글 작성
+        serializer = ArticleSrializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save(author = "adim") #author = request.user
+            serializer.save(author="adim")  # 작성자 로그인한 유저 author = request.user
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
