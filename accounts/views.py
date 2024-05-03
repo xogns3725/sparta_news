@@ -13,6 +13,17 @@ class UserAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+    def put(self, request, username):
+
+        user = request.user
+        if user.username == username:
+            serializer = UserSerializer(
+                user, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(APIView):
