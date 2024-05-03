@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from django.core.cache import cache
 from .models import Article
 from .serializers import ArticleSrializer
@@ -10,6 +12,8 @@ from accounts.models import User
 
 
 class ArticleListAPIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
     def get(self, request):  # article 리스트
         articles = Article.objects.all()
         serializer = ArticleSrializer(articles, many=True)
@@ -18,12 +22,13 @@ class ArticleListAPIView(APIView):
     def post(self, request):  # 게시글 작성
         serializer = ArticleSrializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            # 작성자 로그인한 유저 author = request.user
-            serializer.save(author=User.objects.get(id=1))
+            serializer.save(author=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ArticleDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
         serializer = ArticleSrializer(article)
@@ -31,13 +36,25 @@ class ArticleDetailAPIView(APIView):
 
     def delete(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
-        article.delete()
-
-    #   user =request.user.id
-    #   u_user= article.article_author.id
-    #   if user ==u_user : 글쓴이와 로그인한 사용자 검증
-        return Response(status=status.HTTP_200_OK)
+        user = request.user.id
+        u_user = article.author.id
+        print(user, u_user)
+        if user == u_user:
+            print("일치")
+            article.delete()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response("작성자와 삭제자 id 불일치", status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
-
-        return Response({})
+        article = get_object_or_404(Article, pk=pk)
+        user = request.user.id
+        up_user = article.author.id
+        print(user, up_user)
+        if user == up_user:
+            serializer = ArticleSrializer(
+                article, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
+        return Response("작성자가 아닌디 왜 수정할라그려", status=status.HTTP_400_BAD_REQUEST)
