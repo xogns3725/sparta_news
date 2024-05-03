@@ -6,7 +6,7 @@ from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from django.core.cache import cache
 from .models import Article
-from .serializers import ArticleSrializer
+from .serializers import ArticleSerializer
 from accounts.models import User
 # Create your views here.
 
@@ -16,11 +16,11 @@ class ArticleListAPIView(APIView):
 
     def get(self, request):  # article 리스트
         articles = Article.objects.all()
-        serializer = ArticleSrializer(articles, many=True)
+        serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
 
     def post(self, request):  # 게시글 작성
-        serializer = ArticleSrializer(data=request.data)
+        serializer = ArticleSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(author=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -31,7 +31,7 @@ class ArticleDetailAPIView(APIView):
 
     def get(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
-        serializer = ArticleSrializer(article)
+        serializer = ArticleSerializer(article)
         return Response(serializer.data)
 
     def delete(self, request, pk):
@@ -52,7 +52,7 @@ class ArticleDetailAPIView(APIView):
         up_user = article.author.id
         print(user, up_user)
         if user == up_user:
-            serializer = ArticleSrializer(
+            serializer = ArticleSerializer(
                 article, data=request.data, partial=True)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
