@@ -7,6 +7,7 @@ from .serializers import UserSerializer
 from .models import User
 from django.contrib.auth.hashers import check_password
 
+
 class UserAPIView(APIView):
 
     def post(self, request):
@@ -16,12 +17,14 @@ class UserAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request, username):
+
         user = get_object_or_404(User, username=username)
-        serializer = UserSerializer(
-            user, data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+        if user.username == username:
+            serializer = UserSerializer(
+                user, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request):
