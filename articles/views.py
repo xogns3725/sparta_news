@@ -58,3 +58,16 @@ class ArticleDetailAPIView(APIView):
                 serializer.save()
                 return Response(serializer.data)
         return Response("작성자가 아닌디 왜 수정할라그려", status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    def post(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        user = request.user
+        if user in article.article_likes.all():
+            article.article_likes.remove(user)
+            article.save()
+            return Response("좋아요 취소", status=status.HTTP_200_OK)
+        else:
+            article.article_likes.add(user)
+            article.save()
+            return Response("좋아요 성공", status=status.HTTP_201_CREATED)

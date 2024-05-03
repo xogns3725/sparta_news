@@ -17,7 +17,6 @@ class UserAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request, username):
-
         user = get_object_or_404(User, username=username)
         if user.username == username:
             serializer = UserSerializer(
