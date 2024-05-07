@@ -5,7 +5,7 @@ from accounts.models import User
 class Article(models.Model):
     title = models.CharField(max_length=30)
     content = models.TextField()
-    url = models.TextField()
+    url = models.URLField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='article_author')
     article_likes = models.ManyToManyField(User,related_name='article_likes',)
