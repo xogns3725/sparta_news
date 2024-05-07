@@ -3,11 +3,17 @@ from rest_framework import serializers
 
 
 class ArticleSerializer(serializers.ModelSerializer):
-    article_likes = serializers.IntegerField(source="article_likes.count", read_only=True)
+    likes_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Article
-        fields = ['title', 'content', 'url',]
+        fields = ['title', 'content', 'url', 'likes_count',]
+    
+    def get_likes_count(self, obj):
+        return obj.article_likes.count()
         
 class ArticleDetailSerializer(ArticleSerializer):
     #추후 코멘트 추가해야함
     pass
+
+
