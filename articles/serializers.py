@@ -1,11 +1,11 @@
-from .models import Article, Comments
+from .models import Article, Comment
 from rest_framework import serializers
 
-class CommentsSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     # likes_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = Comments
+        model = Comment
         fields = ['content',]
         # read_only_fields = ("article",)
     

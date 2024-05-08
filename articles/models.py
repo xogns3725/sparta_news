@@ -13,7 +13,7 @@ class Article(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     content = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comment_author')
