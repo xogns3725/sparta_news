@@ -12,12 +12,10 @@ from rest_framework import generics
 # Create your views here.
 
 
-class ArticleListView(generics.ListAPIView):  # 페이지 네이션
-
-    def get(self, request):
-        queryset = Article.objects.all()
-        serializer_class = ArticleSerializer(queryset, many=True)
-        return Response(serializer_class.data)
+class ArticleListView(generics.ListCreateAPIView):  # 페이지 네이션
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def post(self, request):  # 게시글 작성
         author = request.user
