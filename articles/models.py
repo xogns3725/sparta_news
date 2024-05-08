@@ -17,5 +17,6 @@ class Comments(models.Model):
     content = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comment_author')
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comment_article')
     created_at = models.DateTimeField(auto_now_add=True)
     comment_likes = models.ManyToManyField(User,related_name='comment_likes')
