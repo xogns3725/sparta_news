@@ -8,16 +8,17 @@ from django.core.cache import cache
 from .models import Article
 from .serializers import ArticleSerializer
 from accounts.models import User
+from rest_framework import generics
 # Create your views here.
 
 
-class ArticleListAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+class ArticleListView(generics.ListAPIView):  # 페이지 네이션
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
 
-    def get(self, request):  # article 리스트
-        articles = Article.objects.all()
-        serializer = ArticleSerializer(articles, many=True)
-        return Response(serializer.data)
+
+class ArticleCreateAPIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def post(self, request):  # 게시글 작성
         serializer = ArticleSerializer(data=request.data)
