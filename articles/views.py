@@ -20,9 +20,10 @@ class ArticleListView(generics.ListAPIView):  # 페이지 네이션
         return Response(serializer_class.data)
 
     def post(self, request):  # 게시글 작성
+        author = request.user
         serializer = ArticleSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save(author=request.user)
+            serializer.save(author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
