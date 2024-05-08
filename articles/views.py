@@ -8,17 +8,16 @@ from django.core.cache import cache
 from .models import Article
 from .serializers import ArticleSerializer
 from accounts.models import User
+from rest_framework import generics
 # Create your views here.
 
 
-class ArticleListAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+class ArticleListView(generics.ListAPIView):  # 페이지 네이션
 
-    def get(self, request):  # article 리스트
-        articles = Article.objects.all()
-
-        serializer = ArticleSerializer(articles, many=True)
-        return Response(serializer.data)
+    def get(self, request):
+        queryset = Article.objects.all()
+        serializer_class = ArticleSerializer(queryset, many=True)
+        return Response(serializer_class.data)
 
     def post(self, request):  # 게시글 작성
         serializer = ArticleSerializer(data=request.data)
@@ -59,8 +58,7 @@ class ArticleDetailAPIView(APIView):
                 serializer.save()
                 return Response(serializer.data)
         return Response("작성자가 아닌디 왜 수정할라그려", status=status.HTTP_400_BAD_REQUEST)
-    
-    
+
     def post(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
         user = request.user
