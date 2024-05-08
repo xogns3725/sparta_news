@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Article, Comment
-from .serializers import ArticleSerializer, CommentSerializer
+from .serializers import ArticleSerializer, CommentSerializer, ArticleDetailSerializer
 from rest_framework import generics
 # Create your views here.
 
@@ -26,7 +26,7 @@ class ArticleDetailAPIView(APIView):
 
     def get(self, request, article_pk):
         article = get_object_or_404(Article, pk=article_pk)
-        serializer = ArticleSerializer(article)
+        serializer = ArticleDetailSerializer(article)
         return Response(serializer.data)
 
     def delete(self, request, article_pk):
@@ -63,7 +63,7 @@ class ArticleDetailAPIView(APIView):
             article.save()
             return Response("좋아요 성공", status=status.HTTP_201_CREATED)
 
-class ArticleCommentAPIView(APIView):
+class CommentListAPIView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     
     def get(self, request, article_pk):
@@ -79,6 +79,9 @@ class ArticleCommentAPIView(APIView):
             serializer.save(author=request.user, article=article)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+class CommentDetailAPIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
     def put(self, request, comment_pk):
         comment = get_object_or_404(Comment, pk=comment_pk)
         if request.user == comment.author:
@@ -92,3 +95,15 @@ class ArticleCommentAPIView(APIView):
         if request.user == comment.author:
             comment.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)   
+        
+    def post(self, request, comment_pk):
+        comment = get_object_or_404(Comment, pk=comment_pk)
+        user = request.user
+        if user in comment.comment_likes.all():
+            comment.comment_likes.remove(user)
+            comment.save()
+            return Response("좋아요 취소", status=status.HTTP_200_OK)
+        else:
+            comment.comment_likes.add(user)
+            comment.save()
+            return Response("좋아요 성공", status=status.HTTP_201_CREATED)
