@@ -13,9 +13,10 @@ class Article(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     content = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comment_author')
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
     created_at = models.DateTimeField(auto_now_add=True)
     comment_likes = models.ManyToManyField(User,related_name='comment_likes')
