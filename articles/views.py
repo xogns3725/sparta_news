@@ -13,7 +13,7 @@ class ArticleListView(generics.ListCreateAPIView):  # 페이지 네이션
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
-
+    
     def post(self, request):  # 게시글 작성
         author = request.user
         serializer = ArticleSerializer(data=request.data)
@@ -69,7 +69,7 @@ class CommentListAPIView(APIView):
     
     def get(self, request, article_pk):
         article = get_object_or_404(Article, pk=article_pk)
-        comments = article.comment_article.all()    
+        comments = article.comments.all()    
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

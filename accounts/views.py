@@ -6,10 +6,11 @@ from rest_framework import status
 from .serializers import UserSerializer
 from .models import User
 from django.contrib.auth.hashers import check_password
-
+from rest_framework.permissions import IsAuthenticated
 
 class UserAPIView(APIView):
-
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
